@@ -1,4 +1,5 @@
 import os
+import re
 from dotenv import load_dotenv
 from slackclient import SlackClient
 
@@ -11,4 +12,4 @@ if not BOT_ACCESS_TOKEN:
 SLACK_CLIENT = SlackClient(BOT_ACCESS_TOKEN)
 # constants
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
-KARMA_REGEX = r"(?:^| )\<\@([\S]+)\>([\+\-]+)"
+KARMA_REGEX = re.compile(r"(?:^| )\<\@([\S]+)\> ?([\+\-]+)")
