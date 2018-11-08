@@ -11,5 +11,4 @@ if not BOT_ACCESS_TOKEN:
 SLACK_CLIENT = SlackClient(BOT_ACCESS_TOKEN)
 # constants
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
-EXAMPLE_COMMAND = "do"
-MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
+KARMA_REGEX = r"(?:^| )\<\@([\S]+)\>([\+\-]+)"
