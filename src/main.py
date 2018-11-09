@@ -10,6 +10,9 @@ import random
 
 from config import SLACK_CLIENT, RTM_READ_DELAY, KARMA_REGEX, KARMA_URL, KARMA_TIMEOUT, BUZZKILL
 from message_utils import HAPPY_EMOJIS, SAD_EMOJIS, BUZZKILL_EMOJIS, COMFORT_MESSAGES, COMFORT_EMOJIS, make_user_tag, make_emoji_tag
+from math_utils import round_if_int
+
+logging.basicConfig(level=logging.INFO)
 
 # starterbot's user ID in Slack: value is assigned after the bot starts up
 unikarmabot_id = None
@@ -95,11 +98,6 @@ def save_karma_deltas(karma_deltas):
     return karma_responses
 
 
-def round_if_int(num):
-    if int(num) == num:
-        return int(num)
-    return round(num, 2)
-
 def send_karma_responses(karma_responses):
     for karma_response in karma_responses:
         channel = karma_response["slack_id_channel"]
@@ -120,7 +118,6 @@ def send_karma_responses(karma_responses):
         message += make_emoji_tag(emoji)
         message += f"\n{make_user_tag(id_giver)} now has {total_receiver} karma."
 
-
         if delta_giver < 0:
             message += f"{make_user_tag(id_giver)} now has {total_giver} karma."
 
@@ -129,22 +126,25 @@ def send_karma_responses(karma_responses):
 
             message += f"\n{buzzkill_emoji} BUZZKILL ENGAGED. MAXIMUM KARMA CHANGE IS {BUZZKILL} {buzzkill_emoji}"
 
-
-
         SLACK_CLIENT.rtm_send_message(channel, message)
 
 
 if __name__ == '__main__':
     if SLACK_CLIENT.rtm_connect(with_team_state=False):
-        print("Connected.")
+        logging.info("Connected to Slack.")
         unikarmabot_id = SLACK_CLIENT.api_call("auth.test")["user_id"]
-        print(unikarmabot_id)
         while True:
-            messages = SLACK_CLIENT.rtm_read()
-            karma_deltas = filter_and_parse(messages)
-            karma_responses = save_karma_deltas(karma_deltas)
-            if karma_responses:
-                send_karma_responses(karma_responses)
+            try:
+                messages = SLACK_CLIENT.rtm_read()
+                karma_deltas = filter_and_parse(messages)
+                karma_responses = save_karma_deltas(karma_deltas)
+                if karma_responses:
+                    send_karma_responses(karma_responses)
+                time.sleep(RTM_READ_DELAY)
 
+            except KeyboardInterrupt:
+                logging.info("Shutting down the bot.")
+                break
+            except Exception as e:
+                logging.error(f"Oof ouch something bad happened:\n{e}")
 
-            time.sleep(RTM_READ_DELAY)
