@@ -8,7 +8,7 @@ import requests
 import json
 import random
 
-from config import SLACK_CLIENT, RTM_READ_DELAY, KARMA_REGEX, KARMA_URL, KARMA_TIMEOUT, BUZZKILL
+from config import SLACK_CLIENT, RTM_READ_DELAY, KARMA_REGEX, KARMA_URL, KARMA_TIMEOUT, BUZZKILL, KARMABOT_ADMIN_CHANNEL
 from message_utils import (make_user_tag,
                            make_positive_message,
                            make_negative_message,
@@ -37,7 +37,7 @@ def filter_and_parse(messages):
         except Exception as e:
             logging.warn(f"Exception thrown in filter_and_parse: {e}")
     if karma_deltas:
-        print(f"Karma_deltas {karma_deltas}")
+        logging.debug(f"Karma_deltas {karma_deltas}")
     return karma_deltas
 
 
@@ -143,4 +143,10 @@ if __name__ == '__main__':
                 break
             except Exception as e:
                 logging.error(f"Oof ouch something bad happened:\n{e}")
+                try:
+                    if KARMABOT_ADMIN_CHANNEL:
+                        message = f"<!here> Something went wrong:\n{e}"
+                        SLACK_CLIENT.rtm_send_message(KARMABOT_ADMIN_CHANNEL, message)
+                except Exception as e:
+                    logging.error(f"I'm trying to talk but you won't listen!\n{e}")
 

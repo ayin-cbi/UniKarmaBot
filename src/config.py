@@ -18,3 +18,6 @@ KARMA_REGEX = re.compile(r"(?:^| )\<\@([\S]+)\> ?([\+\-]+)")
 KARMA_URL = os.environ.get('KARMA_URL')
 
 BUZZKILL = 100
+
+
+KARMABOT_ADMIN_CHANNEL = 'GDZ9KH17A'
