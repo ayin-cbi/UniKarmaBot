@@ -8,7 +8,7 @@ import requests
 import json
 import random
 
-from config import SLACK_CLIENT, RTM_READ_DELAY, KARMA_REGEX, KARMA_URL, KARMA_TIMEOUT, BUZZKILL, KARMABOT_ADMIN_CHANNEL
+from config import SLACK_CLIENT, RTM_READ_DELAY, KARMA_REGEX, KARMA_URL, KARMA_TIMEOUT, BUZZKILL, KARMABOT_ADMIN_CHANNEL, KARMA_API_KEY
 from message_utils import (make_user_tag,
                            make_positive_message,
                            make_negative_message,
@@ -88,7 +88,9 @@ def save_karma_deltas(karma_deltas):
 
         request_data = {"karma": karma}
         try:
-            r = requests.post(KARMA_URL, json=request_data, timeout=KARMA_TIMEOUT)
+            r = requests.post(KARMA_URL, headers= {'Authorization': KARMA_API_KEY}, json=request_data, timeout=KARMA_TIMEOUT)
+            if r.status_code != 200:
+                raise requests.exceptions.ConnectionError(f"Error reaching Karma backend: {r.status_code}, {r.text}")
             r_json = r.json()
             r_json["slack_id_channel"] = karma["slack_id_channel"]
             r_json["buzzkill"] = karma["buzzkill"]

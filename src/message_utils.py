@@ -11,7 +11,7 @@ HAPPY_EMOJIS = [
     "partyparrot",
     "gt",
     "bhangra",
-    "bicep_left: :tim: :bicep_right", # Fuck off, I know
+    "bicep_left::tim::bicep_right", # Fuck off, I know
     "greenbuilding",
     "partytim",
     "carlton"
