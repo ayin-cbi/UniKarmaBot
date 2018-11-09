@@ -8,7 +8,8 @@ import requests
 import json
 import random
 
-from config import SLACK_CLIENT, RTM_READ_DELAY, KARMA_REGEX, KARMA_URL, HAPPY_EMOJIS, SAD_EMOJIS, BUZZKILL_EMOJIS, BUZZKILL, COMFORT_MESSAGES, COMFORT_EMOJIS
+from config import SLACK_CLIENT, RTM_READ_DELAY, KARMA_REGEX, KARMA_URL, KARMA_TIMEOUT, BUZZKILL
+from message_utils import HAPPY_EMOJIS, SAD_EMOJIS, BUZZKILL_EMOJIS, COMFORT_MESSAGES, COMFORT_EMOJIS, make_user_tag, make_emoji_tag
 
 # starterbot's user ID in Slack: value is assigned after the bot starts up
 unikarmabot_id = None
@@ -80,13 +81,17 @@ def save_karma_deltas(karma_deltas):
     for karma in karma_deltas:
 
         request_data = {"karma": karma}
-        r = requests.post(KARMA_URL, json=request_data)
-        r_json = r.json()
-        r_json["slack_id_channel"] = karma["slack_id_channel"]
-        r_json["buzzkill"] = karma["buzzkill"]
-        logging.info(f"GOT status code: {r.status_code}")
-        logging.info(f"GOT text: {r_json}")
-        karma_responses.append(r_json)
+        try:
+            r = requests.post(KARMA_URL, json=request_data, timeout=KARMA_TIMEOUT)
+            r_json = r.json()
+            r_json["slack_id_channel"] = karma["slack_id_channel"]
+            r_json["buzzkill"] = karma["buzzkill"]
+            logging.info(f"GOT status code: {r.status_code}")
+            logging.info(f"GOT text: {r_json}")
+            karma_responses.append(r_json)
+        except requests.exceptions.Timeout:
+            message = "Karma request timed out. Try again when I'm not so tired."
+            SLACK_CLIENT.rtm_send_message(karma["slack_id_channel"], message)
     return karma_responses
 
 
@@ -105,23 +110,24 @@ def send_karma_responses(karma_responses):
         total_giver = karma_response["total_giver"]
         total_receiver = karma_response["total_receiver"]
 
-        message = f"<@{id_giver}> has given <@{id_receiver}> {delta_receiver} karma."
+        message = f"{make_user_tag(id_giver)} has given {make_user_tag(id_receiver)} {delta_receiver} karma."
 
         if delta_giver < 0:
-            message += f"<@{id_giver}> lost {delta_giver} karma."
+            message += f"{make_user_tag(id_giver)} lost {delta_giver} karma."
             emoji = random.choice(SAD_EMOJIS)
         else:
             emoji = random.choice(HAPPY_EMOJIS)
-        message += f" :{emoji}:"
-        message += f"\n<@{id_receiver}> now has {total_receiver} karma."
+        message += make_emoji_tag(emoji)
+        message += f"\n{make_user_tag(id_giver)} now has {total_receiver} karma."
 
 
         if delta_giver < 0:
-            message += f"<@{id_giver}> now has {total_giver} karma."
+            message += f"{make_user_tag(id_giver)} now has {total_giver} karma."
 
         if karma_response["buzzkill"]:
-            buzzkill_emoji = random.choice(BUZZKILL_EMOJIS)
-            message += f"\n:{buzzkill_emoji}: BUZZKILL ENGAGED. MAXIMUM KARMA CHANGE IS {BUZZKILL} :{buzzkill_emoji}:"
+            buzzkill_emoji = make_emoji_tag(random.choice(BUZZKILL_EMOJIS))
+
+            message += f"\n{buzzkill_emoji} BUZZKILL ENGAGED. MAXIMUM KARMA CHANGE IS {BUZZKILL} {buzzkill_emoji}"
 
 
 
