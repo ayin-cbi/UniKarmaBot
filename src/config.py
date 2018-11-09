@@ -22,10 +22,8 @@ KARMA_URL = os.environ.get('KARMA_URL')
 
 BUZZKILL = 100
 
-
 # TODO: This is a channel ID for a
 KARMABOT_ADMIN_CHANNEL = 'GDZ9KH17A'
-
 
 KARMA_API_KEY = os.environ.get('KARMA_API_KEY')
 if not KARMA_API_KEY:
