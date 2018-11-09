@@ -1,9 +1,20 @@
+import random
+from config import BUZZKILL
+
 HAPPY_EMOJIS = [
     "unicorn_face",
     "grinning",
     "+1",
     "innocent",
-    "money_mouth_face"
+    "money_mouth_face",
+    "billy",
+    "partyparrot",
+    "gt",
+    "bhangra",
+    "bicep_left: :tim: :bicep_right", # Fuck off, I know
+    "greenbuilding",
+    "partytim",
+    "carlton"
 ]
 
 SAD_EMOJIS = [
@@ -11,7 +22,11 @@ SAD_EMOJIS = [
     "skull_and_crossbones",
     "poop",
     "horse",
-    "face_vomiting"
+    "face_vomiting",
+    "angry_unicorn",
+    "badgt",
+    "disapproval",
+    "redbuilding"
 ]
 
 BUZZKILL_EMOJIS = [
@@ -20,7 +35,9 @@ BUZZKILL_EMOJIS = [
     "radioactive_sign",
     "zap",
     "octagonal_sign",
-    "wilted_flower"
+    "wilted_flower",
+    "alert",
+    "10-4"
 ]
 
 
@@ -31,16 +48,26 @@ COMFORT_MESSAGES = [
     "Smile! Billy the unicorn loves you!",
     "You are being comforted.",
     "Executing bin/comfort.sh",
-    "Beep-boop is robot for 'I love you'"
+    "Beep-boop is robot for 'I love you'",
+    "There, there, don't be cry.",
+    "Check this out buddy: https://www.reddit.com/r/aww"
 ]
 
 COMFORT_EMOJIS = [
-    "full_moon_with_face",
-    "sun_with_face",
     "star2",
     "snowman",
     "rainbow",
-    "unicorn_face"
+    "unicorn_face",
+    "billy",
+    "tim",
+    "rainbowcat"
+]
+
+
+CONFUSED_EMOJIS = [
+    "shrug",
+    "interrobang",
+    "question"
 ]
 
 
@@ -50,3 +77,38 @@ def make_user_tag(user):
 
 def make_emoji_tag(emoji):
     return f":{emoji}:"
+
+
+def make_positive_message(giver, receiver, delta_receiver, total_receiver):
+    message = f"{giver} has given {receiver} {delta_receiver} karma. "
+    emoji = random.choice(HAPPY_EMOJIS)
+    message += make_emoji_tag(emoji)
+    message += f"\n{receiver} now has {total_receiver} karma."
+    return message
+
+def make_negative_message(giver, receiver, delta_receiver, delta_giver, total_receiver, total_giver):
+    message = f"{giver} has given {receiver} {delta_receiver} karma. "
+    message += f"{giver} lost {abs(delta_giver)} karma. "
+    emoji = random.choice(SAD_EMOJIS)
+    message += make_emoji_tag(emoji)
+    message += f"\n{receiver} now has {total_receiver} karma."
+    message += f"{giver} now has {total_giver} karma."
+    return message
+
+
+def make_zero_message(giver, receiver):
+    emoji = make_emoji_tag(random.choice(CONFUSED_EMOJIS))
+    return f"{emoji} {giver} gave {receiver} NOTHING. {emoji}"
+
+
+def make_buzzkill_message(message):
+    buzzkill_emoji = make_emoji_tag(random.choice(BUZZKILL_EMOJIS))
+    message += f"\n{buzzkill_emoji} BUZZKILL ENGAGED. MAXIMUM KARMA CHANGE IS {BUZZKILL} {buzzkill_emoji}"
+    return message
+
+
+def make_comfort_message():
+    comfort_message = random.choice(COMFORT_MESSAGES)
+    comfort_emoji = random.choice(COMFORT_EMOJIS)
+    message = f":{comfort_emoji}: {comfort_message} :{comfort_emoji}:"
+    return message

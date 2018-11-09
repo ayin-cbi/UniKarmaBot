@@ -9,7 +9,12 @@ import json
 import random
 
 from config import SLACK_CLIENT, RTM_READ_DELAY, KARMA_REGEX, KARMA_URL, KARMA_TIMEOUT, BUZZKILL
-from message_utils import HAPPY_EMOJIS, SAD_EMOJIS, BUZZKILL_EMOJIS, COMFORT_MESSAGES, COMFORT_EMOJIS, make_user_tag, make_emoji_tag
+from message_utils import (make_user_tag,
+                           make_positive_message,
+                           make_negative_message,
+                           make_zero_message,
+                           make_buzzkill_message,
+                           make_comfort_message)
 from math_utils import round_if_int
 
 logging.basicConfig(level=logging.INFO)
@@ -65,9 +70,7 @@ def convert_to_karma_delta_dict(parsed_messages, id_giver, id_channel):
 
         if id_giver == message[0]:
             if counter < 0:
-                comfort_message = random.choice(COMFORT_MESSAGES)
-                comfort_emoji = random.choice(COMFORT_EMOJIS)
-                message = f":{comfort_emoji}: {comfort_message} :{comfort_emoji}:"
+                message = make_comfort_message()
                 SLACK_CLIENT.rtm_send_message(id_channel, message)
                 continue
             if counter > 0:
@@ -108,24 +111,17 @@ def send_karma_responses(karma_responses):
         total_giver = karma_response["total_giver"]
         total_receiver = karma_response["total_receiver"]
 
-        message = f"{make_user_tag(id_giver)} has given {make_user_tag(id_receiver)} {delta_receiver} karma."
+        giver = make_user_tag(id_giver)
+        receiver = make_user_tag(id_receiver)
 
-        if delta_giver < 0:
-            message += f"{make_user_tag(id_giver)} lost {delta_giver} karma."
-            emoji = random.choice(SAD_EMOJIS)
+        if delta_receiver > 0:
+            message = make_positive_message(giver, receiver, delta_receiver, total_receiver)
+        elif delta_receiver < 0:
+            message = make_negative_message(giver, receiver, delta_receiver, delta_giver, total_receiver, total_giver)
         else:
-            emoji = random.choice(HAPPY_EMOJIS)
-        message += make_emoji_tag(emoji)
-        message += f"\n{make_user_tag(id_giver)} now has {total_receiver} karma."
-
-        if delta_giver < 0:
-            message += f"{make_user_tag(id_giver)} now has {total_giver} karma."
-
+            message = make_zero_message(giver, receiver)
         if karma_response["buzzkill"]:
-            buzzkill_emoji = make_emoji_tag(random.choice(BUZZKILL_EMOJIS))
-
-            message += f"\n{buzzkill_emoji} BUZZKILL ENGAGED. MAXIMUM KARMA CHANGE IS {BUZZKILL} {buzzkill_emoji}"
-
+            message = make_buzzkill_message(message)
         SLACK_CLIENT.rtm_send_message(channel, message)
 
 
