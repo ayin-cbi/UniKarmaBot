@@ -8,7 +8,7 @@ import requests
 import json
 import random
 
-from config import SLACK_CLIENT, RTM_READ_DELAY, KARMA_REGEX, KARMA_URL, HAPPY_EMOJIS, SAD_EMOJIS, BUZZKILL_EMOJIS, BUZZKILL, COMFORT_MESSAGES, COMFORT_EMOJIS
+from config import SLACK_CLIENT, RTM_READ_DELAY, KARMA_REGEX, KARMA_URL, KARMA_TIMEOUT, HAPPY_EMOJIS, SAD_EMOJIS, BUZZKILL_EMOJIS, BUZZKILL, COMFORT_MESSAGES, COMFORT_EMOJIS
 
 # starterbot's user ID in Slack: value is assigned after the bot starts up
 unikarmabot_id = None
@@ -80,13 +80,17 @@ def save_karma_deltas(karma_deltas):
     for karma in karma_deltas:
 
         request_data = {"karma": karma}
-        r = requests.post(KARMA_URL, json=request_data)
-        r_json = r.json()
-        r_json["slack_id_channel"] = karma["slack_id_channel"]
-        r_json["buzzkill"] = karma["buzzkill"]
-        logging.info(f"GOT status code: {r.status_code}")
-        logging.info(f"GOT text: {r_json}")
-        karma_responses.append(r_json)
+        try:
+            r = requests.post(KARMA_URL, json=request_data, timeout=KARMA_TIMEOUT)
+            r_json = r.json()
+            r_json["slack_id_channel"] = karma["slack_id_channel"]
+            r_json["buzzkill"] = karma["buzzkill"]
+            logging.info(f"GOT status code: {r.status_code}")
+            logging.info(f"GOT text: {r_json}")
+            karma_responses.append(r_json)
+        except requests.exceptions.Timeout:
+            message = "Karma request timed out. Try again when I'm not so tired."
+            SLACK_CLIENT.rtm_send_message(karma["slack_id_channel"], message)
     return karma_responses
 
 

@@ -12,6 +12,7 @@ if not BOT_ACCESS_TOKEN:
 SLACK_CLIENT = SlackClient(BOT_ACCESS_TOKEN)
 # constants
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
+KARMA_TIMEOUT = 1
 KARMA_REGEX = re.compile(r"(?:^| )\<\@([\S]+)\> ?([\+\-]+)")
 
 KARMA_URL = os.environ.get('KARMA_URL')
