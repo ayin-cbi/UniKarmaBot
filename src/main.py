@@ -58,7 +58,7 @@ def convert_to_karma_delta_dict(parsed_messages, id_giver, id_channel):
             "buzzkill": False
         }
         counter = 0
-        for char in message[1]:
+        for char in message[1][1:]:
             if char == "+":
                 counter += 1
             elif char == "-":

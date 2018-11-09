@@ -13,10 +13,10 @@ SLACK_CLIENT = SlackClient(BOT_ACCESS_TOKEN)
 # constants
 RTM_READ_DELAY = 1 # 1 second delay between reading from RTM
 KARMA_TIMEOUT = 30
-# Looks for <@user_id> +/- string
-# Looks ahead to make sure, either message terminates or is followed by another karma group
-# If not, does not parse as karma
-KARMA_REGEX = re.compile(r"(?:^| )\<\@([\S]+)\> ?([\+\-]+)(?=[ ]*$|[ ]?(?=\<\@(?:[\S]+)\> ?([\+\-]+)))")
+# Initialize karma with ++/--
+# This counts for one karma
+# All karma after can be + or - and each counts as 1
+KARMA_REGEX = re.compile(r"(?:^| )\<\@([\S]+)\> ?((?:[\+]{2}|[\-]{2})[\+\-]*)")
 
 KARMA_URL = os.environ.get('KARMA_URL')
 
