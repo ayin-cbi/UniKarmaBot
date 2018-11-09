@@ -29,7 +29,9 @@ COMFORT_MESSAGES = [
     "Someone out there loves you. Probably.",
     "You're #1 in my cold, unfeeling, robot heart.",
     "Smile! Billy the unicorn loves you!",
-    "You are being comforted."
+    "You are being comforted.",
+    "Executing bin/comfort.sh",
+    "Beep-boop is robot for 'I love you'"
 ]
 
 COMFORT_EMOJIS = [
