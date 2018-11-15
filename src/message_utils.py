@@ -1,5 +1,5 @@
 import random
-from config import BUZZKILL
+from config import BUZZKILL, KARMA_BOT_ID
 
 HAPPY_EMOJIS = [
     "unicorn_face",
@@ -84,6 +84,8 @@ def make_positive_message(giver, receiver, delta_receiver, total_receiver):
     emoji = random.choice(HAPPY_EMOJIS)
     message += make_emoji_tag(emoji)
     message += f"\n{receiver} now has {total_receiver} karma."
+    if receiver == make_user_tag(KARMA_BOT_ID):
+        message += "\nThanks for the love! :heart_eyes:"
     return message
 
 def make_negative_message(giver, receiver, delta_receiver, delta_giver, total_receiver, total_giver):
@@ -96,6 +98,8 @@ def make_negative_message(giver, receiver, delta_receiver, delta_giver, total_re
 
     if receiver != giver:
         message += f"{giver} now has {total_giver} karma."
+    if receiver == make_user_tag(KARMA_BOT_ID):
+        message += "\nI'm trying my best! :cry:"
     return message
 
 

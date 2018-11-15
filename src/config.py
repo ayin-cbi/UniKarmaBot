@@ -28,3 +28,5 @@ KARMABOT_ADMIN_CHANNEL = 'GDZ9KH17A'
 KARMA_API_KEY = os.environ.get('KARMA_API_KEY')
 if not KARMA_API_KEY:
     raise Exception("No API key found! Can't connect to the backend!")
+
+KARMA_BOT_ID = 'UDX04GT1R'
