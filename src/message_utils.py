@@ -88,11 +88,14 @@ def make_positive_message(giver, receiver, delta_receiver, total_receiver):
 
 def make_negative_message(giver, receiver, delta_receiver, delta_giver, total_receiver, total_giver):
     message = f"{giver} has given {receiver} {delta_receiver} karma. "
-    message += f"{giver} lost {abs(delta_giver)} karma. "
+    if receiver != giver:
+        message += f"{giver} lost {abs(delta_giver)} karma. "
     emoji = random.choice(SAD_EMOJIS)
     message += make_emoji_tag(emoji)
     message += f"\n{receiver} now has {total_receiver} karma."
-    message += f"{giver} now has {total_giver} karma."
+
+    if receiver != giver:
+        message += f"{giver} now has {total_giver} karma."
     return message
 
 
