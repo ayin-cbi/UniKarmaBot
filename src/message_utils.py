@@ -1,5 +1,5 @@
 import random
-from config import BUZZKILL, KARMA_BOT_ID
+from config import BUZZKILL
 
 HAPPY_EMOJIS = [
     "unicorn_face",
@@ -79,16 +79,16 @@ def make_emoji_tag(emoji):
     return f":{emoji}:"
 
 
-def make_positive_message(giver, receiver, delta_receiver, total_receiver):
+def make_positive_message(giver, receiver, delta_receiver, total_receiver, karma_bot_id):
     message = f"{giver} has given {receiver} {delta_receiver} karma. "
     emoji = random.choice(HAPPY_EMOJIS)
     message += make_emoji_tag(emoji)
     message += f"\n{receiver} now has {total_receiver} karma."
-    if receiver == make_user_tag(KARMA_BOT_ID):
+    if receiver == make_user_tag(karma_bot_id):
         message += "\nThanks for the love! :heart_eyes:"
     return message
 
-def make_negative_message(giver, receiver, delta_receiver, delta_giver, total_receiver, total_giver):
+def make_negative_message(giver, receiver, delta_receiver, delta_giver, total_receiver, total_giver, karma_bot_id):
     message = f"{giver} has given {receiver} {delta_receiver} karma. "
     if receiver != giver:
         message += f"{giver} lost {abs(delta_giver)} karma. "
@@ -98,7 +98,7 @@ def make_negative_message(giver, receiver, delta_receiver, delta_giver, total_re
 
     if receiver != giver:
         message += f"{giver} now has {total_giver} karma."
-    if receiver == make_user_tag(KARMA_BOT_ID):
+    if receiver == make_user_tag(karma_bot_id):
         message += "\nI'm trying my best! :cry:"
     return message
 

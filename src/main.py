@@ -103,7 +103,7 @@ def save_karma_deltas(karma_deltas):
     return karma_responses
 
 
-def send_karma_responses(karma_responses):
+def send_karma_responses(karma_responses, karma_bot_id):
     for karma_response in karma_responses:
         channel = karma_response["slack_id_channel"]
         id_giver = karma_response["id_giver"]
@@ -117,9 +117,9 @@ def send_karma_responses(karma_responses):
         receiver = make_user_tag(id_receiver)
 
         if delta_receiver > 0:
-            message = make_positive_message(giver, receiver, delta_receiver, total_receiver)
+            message = make_positive_message(giver, receiver, delta_receiver, total_receiver, karma_bot_id)
         elif delta_receiver < 0:
-            message = make_negative_message(giver, receiver, delta_receiver, delta_giver, total_receiver, total_giver)
+            message = make_negative_message(giver, receiver, delta_receiver, delta_giver, total_receiver, total_giver, karma_bot_id)
         else:
             message = make_zero_message(giver, receiver)
         if karma_response["buzzkill"]:
@@ -137,7 +137,7 @@ if __name__ == '__main__':
                 karma_deltas = filter_and_parse(messages)
                 karma_responses = save_karma_deltas(karma_deltas)
                 if karma_responses:
-                    send_karma_responses(karma_responses)
+                    send_karma_responses(karma_responses, unikarmabot_id)
                 time.sleep(RTM_READ_DELAY)
 
             except KeyboardInterrupt:
